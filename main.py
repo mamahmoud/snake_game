@@ -9,6 +9,7 @@ HEIGHT = 600
 WIDTH = 600
 UNIT_MOVEMENT = 20
 XY_INC = list(range(UNIT_MOVEMENT, WIDTH - UNIT_MOVEMENT + 1, UNIT_MOVEMENT))
+BASE_FPS = 5
 
 
 class Cube:
@@ -138,7 +139,6 @@ class Snake:
         """
         Check if the snake has eaten the food
         """
-        print(c1.x_axis, c1.y_axis)
         if self.body[0].x_axis == c1.x_axis and self.body[0].y_axis == c1.y_axis:
             c1.y_axis = random.choice(XY_INC)
             c1.x_axis = random.choice(XY_INC)
@@ -210,7 +210,7 @@ def main():
         snake_1.draw()
         cube_1.draw()
         pygame.display.update()
-        game_clock.tick(len(Snake.body) // 10 + 5)
+        game_clock.tick(len(Snake.body) // 10 + BASE_FPS)
 
 
 if __name__ == "__main__":
