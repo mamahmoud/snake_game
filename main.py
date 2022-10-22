@@ -12,6 +12,10 @@ XY_INC = list(range(UNIT_MOVEMENT, WIDTH - UNIT_MOVEMENT + 1, UNIT_MOVEMENT))
 
 
 class Cube:
+    """
+    class cube represents the food for the snake and the snake parts.
+    """
+
     def __init__(
         self,
         screen: pygame.Surface,
@@ -22,6 +26,9 @@ class Cube:
         color: tuple = (255, 0, 0),
         is_head: bool = False,
     ):
+        """
+        Init func for the class
+        """
         self.x_axis = x_axis
         self.y_axis = y_axis
         self.screen = screen
@@ -31,6 +38,9 @@ class Cube:
         self.is_head = is_head
 
     def draw(self):
+        """
+        Draws the cube, and special drawing for snake head
+        """
         if not self.is_head:
             pygame.draw.rect(
                 self.screen,
@@ -60,6 +70,9 @@ class Cube:
             )
 
     def move(self, turns: dict):
+        """
+        move and turns the cube based on the dictionary of turns from snake
+        """
         for pos, dirs in turns.items():
             if dirs[2] != 0 and self.x_axis == pos[0] and self.y_axis == pos[1]:
                 self.x_dir = dirs[0]
@@ -72,6 +85,11 @@ class Cube:
 
 
 class Snake:
+
+    """
+    class snake consists of cube lists, and turns.
+    """
+
     body = []
     turns = {}
 
@@ -83,6 +101,9 @@ class Snake:
         x_dir: int = 1,
         y_dir: int = 0,
     ):
+        """
+        Init func for the class
+        """
         self.screen = screen
         self.x_axis = x_axis
         self.y_axis = y_axis
@@ -94,10 +115,16 @@ class Snake:
         self.body.append(self.head)
 
     def draw(self):
+        """
+        Draws the snake, by calling the cube method for each body part, and special drawing for snake head
+        """
         for part in self.body:
             part.draw()
 
     def move(self, x_dir: int, y_dir: int):
+        """
+        move the snake by calling the move from cube, also adds the new turns to the dictionary
+        """
         if not (self.body[0].x_dir == x_dir) and not (self.body[0].y_dir == y_dir):
             self.turns[(self.body[0].x_axis, self.body[0].y_axis)] = [
                 x_dir,
@@ -108,6 +135,9 @@ class Snake:
             part.move(self.turns)
 
     def has_eaten(self, c1: Cube):
+        """
+        Check if the snake has eaten the food
+        """
         print(c1.x_axis, c1.y_axis)
         if self.body[0].x_axis == c1.x_axis and self.body[0].y_axis == c1.y_axis:
             c1.y_axis = random.choice(XY_INC)
@@ -126,6 +156,9 @@ class Snake:
             self.body.insert(0, new_c)
 
     def is_dead(self):
+        """
+        Checks if snake is dead by hitting a wall or itself
+        """
         if (
             (self.body[0].x_axis < 0)
             or (self.body[0].x_axis > WIDTH - UNIT_MOVEMENT)
@@ -140,18 +173,17 @@ class Snake:
             ):
                 return True
 
-    def cleanup_turns(self):
-        pass
-
 
 def main():
+    """
+    main function
+    """
     pygame.init()
     game_screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Snake game")
     game_clock = pygame.time.Clock()
     snake_1 = Snake(game_screen, WIDTH // 2, WIDTH // 2)
     cube_1 = Cube(game_screen, random.choice(XY_INC), random.choice(XY_INC), 0, 0)
-    cube_2 = Cube(game_screen, 580, 600, 0, 0)
     y_dir = 0
     x_dir = 1
     while True:
