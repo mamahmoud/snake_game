@@ -187,6 +187,8 @@ def main():
     y_dir = 0
     x_dir = 1
     while True:
+        if snake_1.is_dead():
+            return
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
@@ -203,8 +205,6 @@ def main():
                 y_dir = 0
                 x_dir = -1
         snake_1.move(x_dir, y_dir)
-        if snake_1.is_dead():
-            return
         snake_1.has_eaten(cube_1)
         game_screen.fill((0, 0, 0))
         snake_1.draw()
