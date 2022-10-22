@@ -6,37 +6,100 @@ import tkinter
 
 HEIGHT = 600
 WIDTH = 600
-UNIT_MOVEMENT = 10
+UNIT_MOVEMENT = 20
+XY_INC = list(range(0, 601, UNIT_MOVEMENT))
 
 
 class Cube:
-    def __init__(self, screen, x_axis, y_axis, x_dir=1, y_dir=0):
+    def __init__(
+        self, screen, x_axis, y_axis, x_dir=1, y_dir=0, color=(255, 0, 0), is_head=False
+    ):
         self.x_axis = x_axis
         self.y_axis = y_axis
         self.screen = screen
         self.y_dir = y_dir
         self.x_dir = x_dir
+        self.color = color
+        self.is_head = is_head
 
     def draw(self):
-        pygame.draw.rect(
-            self.screen,
-            (255, 255, 255),
-            pygame.Rect(self.x_axis, self.y_axis, UNIT_MOVEMENT, UNIT_MOVEMENT),
-        )
+        if not self.is_head:
+            pygame.draw.rect(
+                self.screen,
+                self.color,
+                pygame.Rect(self.x_axis, self.y_axis, UNIT_MOVEMENT, UNIT_MOVEMENT),
+            )
+        else:
+            pygame.draw.rect(
+                self.screen,
+                self.color,
+                pygame.Rect(self.x_axis, self.y_axis, UNIT_MOVEMENT, UNIT_MOVEMENT),
+            )
+            pygame.draw.circle(
+                self.screen,
+                (255, 0, 0),
+                (self.x_axis + UNIT_MOVEMENT // 2, self.y_axis + UNIT_MOVEMENT // 2),
+                2,
+            )
 
-    def move(self):
+    def move(self, turns):
+        for pos, dirs in turns.items():
+            if dirs[2] != 0 and self.x_axis == pos[0] and self.y_axis == pos[1]:
+                self.x_dir = dirs[0]
+                self.y_dir = dirs[1]
+                dirs[2] -= 1
+                break
+
         self.x_axis += self.x_dir * UNIT_MOVEMENT
         self.y_axis += self.y_dir * UNIT_MOVEMENT
 
 
 class Snake:
-    def __init__(self, screen, img, x_axis, y_axis):
-        pass
+    body = []
+    turns = {}
+
+    def __init__(self, screen, x_axis, y_axis, x_dir=1, y_dir=0):
+        self.screen = screen
+        self.x_axis = x_axis
+        self.y_axis = y_axis
+        self.x_dir = x_dir
+        self.y_dir = y_dir
+        self.head = Cube(
+            self.screen, self.x_axis, self.y_axis, x_dir, y_dir, (255, 255, 255), True
+        )
+        self.body.append(self.head)
 
     def draw(self):
-        pass
+        for part in self.body:
+            part.draw()
 
-    def move(self):
+    def move(self, x_dir, y_dir):
+        if not (self.body[0].x_dir == x_dir) and not (self.body[0].y_dir == y_dir):
+            self.turns[(self.body[0].x_axis, self.body[0].y_axis)] = [
+                x_dir,
+                y_dir,
+                len(self.body),
+            ]
+        for part in self.body:
+            part.move(self.turns)
+
+    def has_eaten(self, c1):
+        print(c1.x_axis, c1.y_axis)
+        if self.body[0].x_axis == c1.x_axis and self.body[0].y_axis == c1.y_axis:
+            c1.y_axis = random.choice(XY_INC)
+            c1.x_axis = random.choice(XY_INC)
+
+            new_c = Cube(
+                self.screen,
+                self.body[-1].x_axis + (-1 * UNIT_MOVEMENT * self.body[-1].x_dir),
+                self.body[-1].y_axis + (-1 * UNIT_MOVEMENT * self.body[-1].y_dir),
+                self.body[-1].x_dir,
+                self.body[-1].y_dir,
+                (255, 255, 255),
+            )
+            self.body.append(new_c)
+
+    def cleanup_turns(self):
         pass
 
 
@@ -45,27 +108,32 @@ def main():
     game_screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Snake game")
     game_clock = pygame.time.Clock()
-    c1 = Cube(game_screen, 0, 0)
+    snake_1 = Snake(game_screen, WIDTH // 2, WIDTH // 2)
+    cube_1 = Cube(game_screen, random.choice(XY_INC), random.choice(XY_INC), 0, 0)
+    y_dir = 0
+    x_dir = 1
     while True:
+        snake_1.has_eaten(cube_1)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-                c1.y_dir = -1
-                c1.x_dir = 0
+                y_dir = -1
+                x_dir = 0
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                c1.y_dir = 1
-                c1.x_dir = 0
+                y_dir = 1
+                x_dir = 0
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-                c1.y_dir = 0
-                c1.x_dir = 1
+                y_dir = 0
+                x_dir = 1
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-                c1.y_dir = 0
-                c1.x_dir = -1
+                y_dir = 0
+                x_dir = -1
 
         game_screen.fill((0, 0, 0))
-        c1.move()
-        c1.draw()
+        snake_1.move(x_dir, y_dir)
+        snake_1.draw()
+        cube_1.draw()
         pygame.display.update()
         game_clock.tick(5)
 
