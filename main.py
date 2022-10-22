@@ -210,7 +210,7 @@ def main():
         snake_1.draw()
         cube_1.draw()
         pygame.display.update()
-        game_clock.tick(5)
+        game_clock.tick(len(Snake.body) // 10 + 5)
 
 
 if __name__ == "__main__":
