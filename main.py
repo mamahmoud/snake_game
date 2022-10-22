@@ -133,6 +133,12 @@ class Snake:
             or (self.body[0].y_axis > WIDTH - UNIT_MOVEMENT)
         ):
             return True
+        for part in self.body[1:]:
+            if (
+                part.x_axis == self.body[0].x_axis
+                and part.y_axis == self.body[0].y_axis
+            ):
+                return True
 
     def cleanup_turns(self):
         pass
@@ -171,7 +177,6 @@ def main():
         game_screen.fill((0, 0, 0))
         snake_1.draw()
         cube_1.draw()
-
         pygame.display.update()
         game_clock.tick(5)
 
