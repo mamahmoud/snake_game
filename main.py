@@ -1,10 +1,8 @@
 """
 Snake 2D game
 """
-import math
 import random
 import sys
-import tkinter
 import pygame
 
 
