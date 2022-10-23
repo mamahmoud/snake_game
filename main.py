@@ -8,7 +8,7 @@ import tkinter
 HEIGHT = 600
 WIDTH = 600
 UNIT_MOVEMENT = 20
-XY_INC = list(range(UNIT_MOVEMENT, WIDTH - UNIT_MOVEMENT + 1, UNIT_MOVEMENT))
+XY_INC = set(range(UNIT_MOVEMENT, WIDTH - UNIT_MOVEMENT + 1, UNIT_MOVEMENT))
 BASE_FPS = 5
 
 
@@ -140,20 +140,24 @@ class Snake:
         Check if the snake has eaten the food
         """
         if self.body[0].x_axis == c1.x_axis and self.body[0].y_axis == c1.y_axis:
-            c1.y_axis = random.choice(XY_INC)
-            c1.x_axis = random.choice(XY_INC)
-
             new_c = Cube(
                 self.screen,
-                self.body[0].x_axis + (UNIT_MOVEMENT * self.body[0].x_dir),
-                self.body[0].y_axis + (UNIT_MOVEMENT * self.body[0].y_dir),
-                self.body[0].x_dir,
-                self.body[0].y_dir,
+                self.body[-1].x_axis + (-1 * UNIT_MOVEMENT * self.body[-1].x_dir),
+                self.body[-1].y_axis + (-1 * UNIT_MOVEMENT * self.body[-1].y_dir),
+                self.body[-1].x_dir,
+                self.body[-1].y_dir,
                 (255, 255, 255),
-                True,
             )
-            self.body[0].is_head = False
-            self.body.insert(0, new_c)
+            for pos, dirs in self.turns.items():
+                if dirs[2] > 0:
+                    dirs[2] += 1
+            self.body.append(new_c)
+            all_x_axis = set(part.x_axis for part in self.body)
+            all_y_axis = set(part.y_axis for part in self.body)
+            diff_x_axis = all_x_axis.symmetric_difference(XY_INC)
+            diff_y_axis = all_y_axis.symmetric_difference(XY_INC)
+            c1.y_axis = random.choice(diff_y_axis)
+            c1.x_axis = random.choice(diff_x_axis)
 
     def is_dead(self):
         """
