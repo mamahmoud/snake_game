@@ -158,8 +158,8 @@ class Snake:
             self.body.append(new_c)
             all_x_axis = set(part.x_axis for part in self.body)
             all_y_axis = set(part.y_axis for part in self.body)
-            diff_x_axis = all_x_axis.symmetric_difference(XY_INC)
-            diff_y_axis = all_y_axis.symmetric_difference(XY_INC)
+            diff_x_axis = list(all_x_axis.symmetric_difference(XY_INC))
+            diff_y_axis = list(all_y_axis.symmetric_difference(XY_INC))
             food.y_axis = random.choice(diff_y_axis)
             food.x_axis = random.choice(diff_x_axis)
 
@@ -191,7 +191,9 @@ def main():
     pygame.display.set_caption("Snake game")
     game_clock = pygame.time.Clock()
     snake_1 = Snake(game_screen, WIDTH // 2, WIDTH // 2)
-    cube_1 = Cube(game_screen, random.choice(XY_INC), random.choice(XY_INC), 0, 0)
+    cube_1 = Cube(
+        game_screen, random.choice(list(XY_INC)), random.choice(list(XY_INC)), 0, 0
+    )
     y_dir = 0
     x_dir = 1
     while True:
