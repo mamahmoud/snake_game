@@ -1,9 +1,12 @@
+"""
+Snake 2D game
+"""
 import math
-from operator import truediv
 import random
 import sys
-import pygame
 import tkinter
+import pygame
+
 
 HEIGHT = 600
 WIDTH = 600
@@ -117,7 +120,8 @@ class Snake:
 
     def draw(self):
         """
-        Draws the snake, by calling the cube method for each body part, and special drawing for snake head
+        Draws the snake, by calling the cube method for each body part,
+        and special drawing for snake head.
         """
         for part in self.body:
             part.draw()
@@ -135,11 +139,11 @@ class Snake:
         for part in self.body:
             part.move(self.turns)
 
-    def has_eaten(self, c1: Cube):
+    def has_eaten(self, food: Cube):
         """
         Check if the snake has eaten the food
         """
-        if self.body[0].x_axis == c1.x_axis and self.body[0].y_axis == c1.y_axis:
+        if self.body[0].x_axis == food.x_axis and self.body[0].y_axis == food.y_axis:
             new_c = Cube(
                 self.screen,
                 self.body[-1].x_axis + (-1 * UNIT_MOVEMENT * self.body[-1].x_dir),
@@ -148,7 +152,7 @@ class Snake:
                 self.body[-1].y_dir,
                 (255, 255, 255),
             )
-            for pos, dirs in self.turns.items():
+            for _, dirs in self.turns.items():
                 if dirs[2] > 0:
                     dirs[2] += 1
             self.body.append(new_c)
@@ -156,8 +160,8 @@ class Snake:
             all_y_axis = set(part.y_axis for part in self.body)
             diff_x_axis = all_x_axis.symmetric_difference(XY_INC)
             diff_y_axis = all_y_axis.symmetric_difference(XY_INC)
-            c1.y_axis = random.choice(diff_y_axis)
-            c1.x_axis = random.choice(diff_x_axis)
+            food.y_axis = random.choice(diff_y_axis)
+            food.x_axis = random.choice(diff_x_axis)
 
     def is_dead(self):
         """
