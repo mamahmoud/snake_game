@@ -27,6 +27,7 @@ class Cube:
         y_dir: int = 0,
         color: tuple = (255, 0, 0),
         is_head: bool = False,
+        is_food: bool = False,
     ):
         """
         Init func for the class
@@ -38,17 +39,63 @@ class Cube:
         self.x_dir = x_dir
         self.color = color
         self.is_head = is_head
+        self.is_food = is_food
 
     def draw(self):
         """
         Draws the cube, and special drawing for snake head
         """
-        if not self.is_head:
+        if not self.is_head and self.is_food:
             pygame.draw.rect(
                 self.screen,
                 self.color,
                 pygame.Rect(self.x_axis, self.y_axis, UNIT_MOVEMENT, UNIT_MOVEMENT),
             )
+        elif not self.is_head and not self.is_food:
+            pygame.draw.rect(
+                self.screen,
+                self.color,
+                pygame.Rect(self.x_axis, self.y_axis, UNIT_MOVEMENT, UNIT_MOVEMENT),
+            )
+            pygame.draw.line(
+                self.screen,
+                (0, 0, 0),
+                (self.x_axis, self.y_axis),
+                (self.x_axis + UNIT_MOVEMENT, self.y_axis + UNIT_MOVEMENT),
+            )
+            pygame.draw.line(
+                self.screen,
+                (0, 0, 0),
+                (self.x_axis + UNIT_MOVEMENT, self.y_axis),
+                (self.x_axis, self.y_axis + UNIT_MOVEMENT),
+            )
+            # if abs(self.x_dir) == 1:
+            #     pygame.draw.line(
+            #         self.screen,
+            #         (0, 0, 0),
+            #         (self.x_axis, self.y_axis),
+            #         (self.x_axis, self.y_axis + UNIT_MOVEMENT),
+            #     )
+            #     pygame.draw.line(
+            #         self.screen,
+            #         (0, 0, 0),
+            #         (self.x_axis + UNIT_MOVEMENT, self.y_axis + UNIT_MOVEMENT),
+            #         (self.x_axis + UNIT_MOVEMENT, self.y_axis + UNIT_MOVEMENT),
+            #     )
+            # elif abs(self.y_dir) == 1:
+            #     pygame.draw.line(
+            #         self.screen,
+            #         (0, 0, 0),
+            #         (self.x_axis, self.y_axis),
+            #         (self.x_axis + UNIT_MOVEMENT, self.y_axis),
+            #     )
+            #     pygame.draw.line(
+            #         self.screen,
+            #         (0, 0, 0),
+            #         (self.x_axis, self.y_axis + UNIT_MOVEMENT),
+            #         (self.x_axis + UNIT_MOVEMENT, self.y_axis + UNIT_MOVEMENT),
+            #     )
+
         else:
             pygame.draw.rect(
                 self.screen,
@@ -84,6 +131,15 @@ class Cube:
 
         self.x_axis += self.x_dir * UNIT_MOVEMENT
         self.y_axis += self.y_dir * UNIT_MOVEMENT
+
+    def change_pos_random(self, all_x_axis, all_y_axis):
+        """
+        Changing position for cube food randomly
+        """
+        diff_x_axis = list(all_x_axis.symmetric_difference(XY_INC))
+        diff_y_axis = list(all_y_axis.symmetric_difference(XY_INC))
+        self.x_axis = random.choice(diff_x_axis)
+        self.y_axis = random.choice(diff_y_axis)
 
 
 class Snake:
@@ -156,10 +212,7 @@ class Snake:
             self.body.append(new_c)
             all_x_axis = set(part.x_axis for part in self.body)
             all_y_axis = set(part.y_axis for part in self.body)
-            diff_x_axis = list(all_x_axis.symmetric_difference(XY_INC))
-            diff_y_axis = list(all_y_axis.symmetric_difference(XY_INC))
-            food.y_axis = random.choice(diff_y_axis)
-            food.x_axis = random.choice(diff_x_axis)
+            food.change_pos_random(all_x_axis, all_y_axis)
 
     def is_dead(self):
         """
@@ -190,7 +243,14 @@ def main():
     game_clock = pygame.time.Clock()
     snake_1 = Snake(game_screen, WIDTH // 2, WIDTH // 2)
     cube_1 = Cube(
-        game_screen, random.choice(list(XY_INC)), random.choice(list(XY_INC)), 0, 0
+        game_screen,
+        random.choice(list(XY_INC)),
+        random.choice(list(XY_INC)),
+        0,
+        0,
+        (255, 0, 0),
+        False,
+        True,
     )
     y_dir = 0
     x_dir = 1
